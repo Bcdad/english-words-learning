@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            font-size: 20px;
+        }
+
+        #container {
+            width: 600px;
+            min-height: 100%;
+            margin: 0 auto;
+            padding-left: 100px;
+            padding-right: 50px;
+            background-color: rgb(202, 192, 168);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .divider {
+            height: 2px;
+            width: 500px;
+            background-color: #0f0e0e;
+            margin-left: -50px;
+        }
+
+        body {
+            background-image: url("/./static/background.jpeg");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 200vh;
+        }
+
+        .bottom {
+            position: fixed;
+            bottom: 20px;
+            right: 40px;
+            margin: 0 auto;
+            width: 100px;
+            height: 30px;
+            display: block;
+            border-radius: 15px;
+            overflow: hidden;
+            text-decoration: none;
+            text-align: center;
+            line-height: 30px;
+
+
+        }
+
+        .bottom::after {
+            content: '';
+            width: 200px;
+            height: 200px;
+            position: absolute;
+            background-color: #fff;
+            top: -40px;
+            left: -20px;
+            background-image: linear-gradient(to right, #a1a09a, #cfd340, #616b07);
+            z-index: -1;
+            transition: all 200ms ease;
+        }
+
+        .bottom:hover::after {
+            transform: rotate(100deg);
+        }
+
+        .bottom:hover {
+            width: 120px;
+            height: 36px;
+            border-radius: 18px;
+            box-shadow: 10px -10px 10px 0px #313131;
+        }
+    </style>
+</head>
+
+<body>
+<div id="container">
+    <form action="/" id="form">
+        <label for="text">请输入要学习的单词数</label>
+        <input type="text" name="text" id="d">
+        <input type="submit" value="确定">
+    </form>
+    <div id="content"></div>
+</div>
+<div><a href="/translate/{{ user }}" class="bottom">返回</a></div>
+<!-- <div class="divider"></div> -->
+<script>
+    const container = document.getElementById('content')
+    let user = '{{user}}'
+    let study
+    document.getElementById('form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        let user = '{{user}}'
+        let num = document.getElementById('d').value;
+        fetch('/api/v1.0/study', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user: user,
+                num: num
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                study = data['content']
+                console.log(study)
+                for (let i = 0; i < study.length; i++) {
+                    const div = document.createElement('div')
+                    const div1 = document.createElement('div')
+                    const div2 = document.createElement('div')
+                    const div3 = document.createElement('div')
+                    const div4 = document.createElement('div')
+                    const div5 = document.createElement('div')
+                    div1.textContent = study[i]['english']
+                    div2.textContent = study[i]['phonetic']
+                    div3.textContent = study[i]['chinese']
+                    div4.textContent = study[i]['sentence1']
+                    div5.textContent = study[i]['sentence2']
+                    div.appendChild(div1)
+                    div.appendChild(div2)
+                    div.appendChild(div3)
+                    div.appendChild(div4)
+                    div.appendChild(div5)
+                    container.appendChild(div)
+                    if (i < study.length-1) {
+                        const divider = document.createElement('div')
+                        divider.className = 'divider'
+                        container.appendChild(divider)
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            })
+    })
+
+
+</script>
+</body>
+
+</html>

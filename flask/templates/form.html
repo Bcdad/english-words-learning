@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="stylesheet" href="../static/login.css">
+    <style>
+        #in {
+            width: 320px;
+            height: 100px;
+            border-radius: 10px;
+            border: 0;
+            padding: 10px;
+            outline: 10px rgb(27, 139, 225);
+        }
+
+        #sub {
+            height: 30px;
+            width: 70px;
+            border-radius: 10px;
+            border-color: #f1f4f9;
+            outline: 10px rgb(27, 139, 225);
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<section>
+    <div class="color"></div>
+    <div class="color"></div>
+    <div class="color"></div>
+    <div class="box">
+        <div class="square" style="--i:0;" id="data"><a href="/data/{{ username }}">data</a></div>
+        <div class="square" style="--i:1;" id="study"><a href="/study/{{ username }}">study</a></div>
+        {#            <div class="square" style="--i:2;"></div>#}
+        {#            <div class="square" style="--i:3;"></div>#}
+        {#            <div class="square" style="--i:4;"></div>#}
+        <div class="container">
+            <div class="form" id="sign">
+                <form id="_form">
+                    <div>
+                        <textarea name="word" id="in" cols="45" rows="5" placeholder="请输入文本"></textarea>
+                    </div>
+                    {# <div>#}
+                    {# <input type="radio" name="option" id="chn">#}
+                    {# <label for="chn">将英文翻译为中文</label>#}
+                    {# <input type="radio" name="option" id="eng">#}
+                    {# <label for="eng">将中文翻译为英文</label>#}
+                    {# </div>#}
+                    <div>
+                        <input type="checkbox" name="hold" id="hold">
+                        <label for="hold">将此单词添加至我的学习</label>
+                    </div>
+                    <div>
+                        <input type="submit" value="翻译" id="sub">
+                    </div>
+                </form>
+                <div id="result">
+                    <p id="i1"></p>
+                    <p id="i2"></p>
+                    <p id="i3"></p>
+                    <p id="i4"></p>
+                    <p id="i5"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    document.getElementById('study').addEventListener('click', function () {
+        window.location.href = this.querySelector('a').href;
+    });
+    document.getElementById('data').addEventListener('click', function () {
+        window.location.href = '/data/{{ username }}';
+    });
+
+    let username = '{{ username }}'
+    console.log(username)
+    document.getElementById('_form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        let word = document.getElementById('in').value;
+        let hold;
+        if (document.querySelectorAll("[name = 'hold']")[0].checked) {
+            hold = 'yes'
+        } else {
+            hold = 'no'
+        }
+        console.log(word, hold)
+        fetch('/api/v1.0', {
+            method: ['POST'],
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                word: word,
+                hold: hold,
+                username: username
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                document.getElementById('i1').innerText = data['english']
+                document.getElementById('i2').innerHTML = data['phonetic']
+                document.getElementById('i3').innerHTML = data['chinese']
+                document.getElementById('i4').innerHTML = data['sentence1']
+                document.getElementById('i5').innerHTML = data['sentence2']
+            })
+            .catch((error) => {
+                console.error('Error', error)
+            })
+
+    })
+
+</script>
+</body>
+
+</html>

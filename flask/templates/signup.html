@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="stylesheet" href="../static/login.css">
+</head>
+
+<body>
+<section>
+    <div class="color"></div>
+    <div class="color"></div>
+    <div class="color"></div>
+    <div class="box">
+        <div class="square" style="--i:0;"></div>
+        <div class="square" style="--i:1;"></div>
+        <div class="square" style="--i:2;"></div>
+        <div class="square" style="--i:3;"></div>
+        <div class="square" style="--i:4;"></div>
+        <div class="container">
+            <div class="form" id="sign">
+                <h2>Login Form</h2>
+                <form action="{{ url_for('sign_up') }}" method="post">
+                    <table>
+                        <div class="inputBox">
+                            <input type="text" name="Username" placeholder="请输入账号(3~20位)" id="account">
+                        </div>
+                        <div class="inputBox">
+                            <input type="password" name="Password" placeholder="请输入密码(6~20位)" id="pass1">
+                        </div>
+                        <div class="inputBox">
+                            <input type="password" name="confirm_password" placeholder="请再次输入密码" id="pass2">
+                        </div>
+                        <div class="inputBox">
+                            <input type="submit" value="Sign Up">
+                        </div>
+                        {% for message in get_flashed_messages() %}
+                            <p class="forget">{{ message }}</p>
+                        {% endfor %}
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    document.getElementById('sign').addEventListener('submit', function (e) {
+        e.preventDefault();
+        let account = document.getElementById('account').value;
+        let pass1 = document.getElementById('pass1').value
+        let pass2 = document.getElementById('pass2').value
+        fetch('/api/v2.0', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                account: account,
+                pass1: pass1,
+                pass2: pass2
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data['pass3'] === 'no') {
+                    alert('两次密码不一致')
+                }
+                if (data['pass4'] === 'no') {
+                    alert('账号或密码格式不正确')
+                }
+                if (data['pass5'] === 'no') {
+                    alert('该账号已存在')
+                }
+                if (data['pass4'] === 'yes' && data['pass3'] === 'yes' && data['pass5'] === 'yes') {
+                    alert('注册成功')
+                }
+            })
+            .catch((error) => {
+                console.error('Error', error)
+            })
+    })
+
+</script>
+</body>
+
+</html>
